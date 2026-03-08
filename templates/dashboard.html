@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Patient Records{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+<p>Welcome, <strong>{{ session.get("username") }}</strong>. You are logged in as <strong>{{ session.get("role") }}</strong>.</p>
+
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <h2>{{ patient_count }}</h2>
+        <p>Active Patients</p>
+    </div>
+</div>
+
+<div class="dashboard-links">
+    <h2>Quick Actions</h2>
+    <ul>
+        <li><a href="{{ url_for('patients') }}">View All Patients</a></li>
+        <li><a href="{{ url_for('add_patient') }}">Add New Patient</a></li>
+        {% if session.get("role") == "admin" %}
+            <li><a href="{{ url_for('register') }}">Register New User</a></li>
+            <li><a href="{{ url_for('admin_users') }}">Manage Users</a></li>
+            <li><a href="{{ url_for('audit_log') }}">View Audit Log</a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}

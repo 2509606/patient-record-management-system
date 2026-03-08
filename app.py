@@ -275,3 +275,13 @@ def register():
     return render_template("register.html")
 
 
+# --- Dashboard ---
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    # I want to show different information depending on the user's role
+    patient_count = patients_collection.count_documents({"status": "active"})
+    return render_template("dashboard.html", patient_count=patient_count)
+
+
