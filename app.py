@@ -290,11 +290,26 @@ def dashboard():
 @app.route("/patients")
 @login_required
 def patients():
-    # I'll show all active patients in a table
+    # I'll show active patients with pagination (10 per page)
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+    skip = (page - 1) * per_page
+
+    total = patients_collection.count_documents({"status": "active"})
+    total_pages = (total + per_page - 1) // per_page
     all_patients = list(
-        patients_collection.find({"status": "active"}).sort("created_at", -1)
+        patients_collection.find({"status": "active"})
+        .sort("created_at", -1)
+        .skip(skip)
+        .limit(per_page)
     )
-    return render_template("patients.html", patients=all_patients)
+    return render_template(
+        "patients.html",
+        patients=all_patients,
+        page=page,
+        total_pages=total_pages,
+        total=total,
+    )
 
 
 @app.route("/patient/add", methods=["GET", "POST"])
@@ -425,19 +440,49 @@ def archive_patient(patient_id):
 @app.route("/admin/users")
 @admin_required
 def admin_users():
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+    offset = (page - 1) * per_page
+
     db = get_db()
+    total = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    total_pages = (total + per_page - 1) // per_page
     users = db.execute(
-        "SELECT id, username, role, created_at FROM users ORDER BY created_at DESC"
+        "SELECT id, username, role, created_at FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?",
+        (per_page, offset),
     ).fetchall()
-    return render_template("admin_users.html", users=users)
+    return render_template(
+        "admin_users.html",
+        users=users,
+        page=page,
+        total_pages=total_pages,
+        total=total,
+    )
 
 
 @app.route("/audit")
 @admin_required
 def audit_log():
-    # I'll show the most recent audit entries at the top
-    logs = list(audit_collection.find().sort("timestamp", -1))
-    return render_template("audit_log.html", logs=logs)
+    # I'll show the most recent audit entries at the top with pagination
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+    skip = (page - 1) * per_page
+
+    total = audit_collection.count_documents({})
+    total_pages = (total + per_page - 1) // per_page
+    logs = list(
+        audit_collection.find()
+        .sort("timestamp", -1)
+        .skip(skip)
+        .limit(per_page)
+    )
+    return render_template(
+        "audit_log.html",
+        logs=logs,
+        page=page,
+        total_pages=total_pages,
+        total=total,
+    )
 
 
 # --- App startup ---
