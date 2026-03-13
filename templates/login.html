@@ -1,20 +1,62 @@
 {% extends "base.html" %}
 {% block title %}Login - Patient Records{% endblock %}
 
-{% block content %}
-<div class="form-container">
-    <h1>Login</h1>
-    <form method="POST">
-        <!-- I need to include the CSRF token in every form to prevent forgery attacks -->
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+{% block layout %}
+<div class="min-h-screen flex items-center justify-center bg-muted/40">
+    <div class="w-full max-w-md px-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-4 space-y-2">
+                {% for category, message in messages %}
+                    {% if category == "success" %}
+                    <div class="flex items-center gap-2 px-4 py-3 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ message }}
+                    </div>
+                    {% else %}
+                    <div class="flex items-center gap-2 px-4 py-3 rounded-lg bg-red-50 text-red-800 border border-red-200 text-sm">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ message }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
 
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" required>
+        <div class="bg-card border border-border rounded-xl shadow-sm p-8">
+            <div class="mb-6 text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
+                        <svg class="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="text-xl font-semibold text-card-foreground">Patient Records</h1>
+                <p class="text-sm text-muted-foreground mt-1">Sign in to your account</p>
+            </div>
+            <form method="POST" class="space-y-4">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+                <div>
+                    <label for="username" class="block text-sm font-medium text-foreground mb-1.5">Username</label>
+                    <input type="text" id="username" name="username" required
+                           class="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring transition-colors">
+                </div>
 
-        <button type="submit">Login</button>
-    </form>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-foreground mb-1.5">Password</label>
+                    <input type="password" id="password" name="password" required
+                           class="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring transition-colors">
+                </div>
+
+                <button type="submit"
+                        class="w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring/40 transition-colors cursor-pointer">
+                    Sign in
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,25 +1,50 @@
 {% extends "base.html" %}
 {% block title %}Register User - Patient Records{% endblock %}
+{% block page_title %}Register User{% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <h1>Register New User</h1>
-    <form method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<div class="max-w-md">
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-foreground tracking-tight">Register New User</h1>
+        <p class="text-sm text-muted-foreground mt-1">Create a new system user account</p>
+    </div>
 
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" required>
+    <div class="bg-card border border-border rounded-xl shadow-sm">
+        <form method="POST" class="p-6 space-y-5">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+            <div>
+                <label for="username" class="block text-sm font-medium text-foreground mb-1.5">Username</label>
+                <input type="text" id="username" name="username" required
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring transition-colors">
+            </div>
 
-        <label for="role">Role</label>
-        <select id="role" name="role">
-            <option value="clinician">Clinician</option>
-            <option value="admin">Admin</option>
-        </select>
+            <div>
+                <label for="password" class="block text-sm font-medium text-foreground mb-1.5">Password</label>
+                <input type="password" id="password" name="password" required
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring transition-colors">
+            </div>
 
-        <button type="submit">Register</button>
-    </form>
+            <div>
+                <label for="role" class="block text-sm font-medium text-foreground mb-1.5">Role</label>
+                <select id="role" name="role"
+                        class="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring transition-colors">
+                    <option value="clinician">Clinician</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer">
+                    Register
+                </button>
+                <a href="{{ url_for('admin_users') }}"
+                   class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-border bg-background text-foreground hover:bg-accent transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

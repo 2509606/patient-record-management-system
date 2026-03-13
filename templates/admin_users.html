@@ -1,28 +1,48 @@
 {% extends "base.html" %}
 {% block title %}Manage Users - Patient Records{% endblock %}
+{% block page_title %}Users{% endblock %}
 
 {% block content %}
-<h1>Registered Users</h1>
-<a href="{{ url_for('register') }}" class="btn">Register New User</a>
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-semibold text-foreground tracking-tight">Registered Users</h1>
+        <p class="text-sm text-muted-foreground mt-1">Manage system user accounts</p>
+    </div>
+    <a href="{{ url_for('register') }}"
+       class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+        Register User
+    </a>
+</div>
 
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Role</th>
-            <th>Created At</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.role }}</td>
-            <td>{{ user.created_at|datetimeformat }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border bg-muted/50">
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">ID</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Username</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Role</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                    <td class="px-4 py-3 font-mono text-xs text-muted-foreground">{{ user.id }}</td>
+                    <td class="px-4 py-3 font-medium">{{ user.username }}</td>
+                    <td class="px-4 py-3">
+                        {% if user.role == "admin" %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary">{{ user.role }}</span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground">{{ user.role }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-muted-foreground">{{ user.created_at|datetimeformat }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

@@ -1,47 +1,90 @@
 {% extends "base.html" %}
 {% block title %}Patients - Patient Records{% endblock %}
+{% block page_title %}Patients{% endblock %}
 
 {% block content %}
-<h1>Patient Records</h1>
-<a href="{{ url_for('add_patient') }}" class="btn">Add New Patient</a>
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-semibold text-foreground tracking-tight">Patient Records</h1>
+        <p class="text-sm text-muted-foreground mt-1">Manage and view all patient records</p>
+    </div>
+    <a href="{{ url_for('add_patient') }}"
+       class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        Add Patient
+    </a>
+</div>
 
 {% if patients %}
-<table>
-    <thead>
-        <tr>
-            <th>Patient ID</th>
-            <th>Age</th>
-            <th>Sex</th>
-            <th>Blood Pressure</th>
-            <th>Cholesterol</th>
-            <th>Created By</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for patient in patients %}
-        <tr>
-            <td>{{ patient._id }}</td>
-            <td>{{ patient.age }}</td>
-            <td>{{ patient.sex }}</td>
-            <td>{{ patient.blood_pressure }}</td>
-            <td>{{ patient.cholesterol }}</td>
-            <td>{{ patient.created_by_name }}</td>
-            <td>
-                <a href="{{ url_for('view_patient', patient_id=patient._id) }}">View</a>
-                <a href="{{ url_for('edit_patient', patient_id=patient._id) }}">Edit</a>
-                {% if session.get("role") == "admin" %}
-                <form method="POST" action="{{ url_for('archive_patient', patient_id=patient._id) }}" class="inline-form">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <button type="submit" class="btn-danger" onclick="return confirm('Are you sure you want to archive this patient?')">Archive</button>
-                </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border bg-muted/50">
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Patient ID</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Age</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Sex</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Blood Pressure</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Cholesterol</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Created By</th>
+                    <th class="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr class="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                    <td class="px-4 py-3 font-mono text-xs text-muted-foreground">{{ patient._id }}</td>
+                    <td class="px-4 py-3">{{ patient.age }}</td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground">{{ patient.sex }}</span>
+                    </td>
+                    <td class="px-4 py-3">{{ patient.blood_pressure or "N/A" }}</td>
+                    <td class="px-4 py-3">
+                        {% if patient.cholesterol == "High" %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-700">{{ patient.cholesterol }}</span>
+                        {% elif patient.cholesterol == "Above Normal" %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700">{{ patient.cholesterol }}</span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700">{{ patient.cholesterol or "N/A" }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-muted-foreground">{{ patient.created_by_name }}</td>
+                    <td class="px-4 py-3 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <a href="{{ url_for('view_patient', patient_id=patient._id) }}"
+                               class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-md border border-border bg-background text-foreground hover:bg-accent transition-colors">
+                                View
+                            </a>
+                            <a href="{{ url_for('edit_patient', patient_id=patient._id) }}"
+                               class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-md border border-border bg-background text-foreground hover:bg-accent transition-colors">
+                                Edit
+                            </a>
+                            {% if session.get("role") == "admin" %}
+                            <form method="POST" action="{{ url_for('archive_patient', patient_id=patient._id) }}" class="inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <button type="submit"
+                                        onclick="return confirm('Are you sure you want to archive this patient?')"
+                                        class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors cursor-pointer">
+                                    Archive
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% else %}
-<p>No patient records found.</p>
+<div class="bg-card border border-border rounded-xl shadow-sm p-12 text-center">
+    <svg class="w-12 h-12 mx-auto text-muted-foreground/40 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    <p class="text-muted-foreground text-sm">No patient records found.</p>
+    <a href="{{ url_for('add_patient') }}" class="inline-flex items-center gap-2 mt-4 px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        Add First Patient
+    </a>
+</div>
 {% endif %}
 {% endblock %}
