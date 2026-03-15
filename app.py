@@ -477,6 +477,9 @@ def admin_users():
             "SELECT id, username, role, created_at FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?",
             (per_page, offset),
         ).fetchall()
+    total_users = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    total_admins = db.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'").fetchone()[0]
+    total_clinicians = db.execute("SELECT COUNT(*) FROM users WHERE role = 'clinician'").fetchone()[0]
     return render_template(
         "admin_users.html",
         users=users,
@@ -484,6 +487,9 @@ def admin_users():
         total_pages=total_pages,
         total=total,
         search=search,
+        total_users=total_users,
+        total_admins=total_admins,
+        total_clinicians=total_clinicians,
     )
 
 
