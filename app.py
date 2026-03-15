@@ -15,7 +15,7 @@ from flask import (
     session, flash, g
 )
 from werkzeug.security import generate_password_hash, check_password_hash
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
 
 load_dotenv()
 
@@ -26,6 +26,10 @@ mongo_client = MongoClient(os.environ["MONGO_URI"])
 mongo_db = mongo_client[os.environ.get("MONGO_DB_NAME", "patient_records")]
 patients_collection = mongo_db["patients"]
 audit_collection = mongo_db["audit_log"]
+
+# Create indexes for fast search
+patients_collection.create_index([("patient_id", ASCENDING)])
+patients_collection.create_index([("status", ASCENDING)])
 
 DATABASE = os.environ.get("DATABASE")
 
@@ -309,11 +313,16 @@ def patients():
     page = request.args.get("page", 1, type=int)
     per_page = 10
     skip = (page - 1) * per_page
+    search = request.args.get("search", "").strip()
 
-    total = patients_collection.count_documents({"status": "active"})
+    query = {"status": "active"}
+    if search:
+        query["patient_id"] = {"$regex": re.escape(search), "$options": "i"}
+
+    total = patients_collection.count_documents(query)
     total_pages = (total + per_page - 1) // per_page
     all_patients = list(
-        patients_collection.find({"status": "active"})
+        patients_collection.find(query)
         .sort("created_at", -1)
         .skip(skip)
         .limit(per_page)
@@ -324,6 +333,7 @@ def patients():
         page=page,
         total_pages=total_pages,
         total=total,
+        search=search,
     )
 
 
@@ -447,20 +457,33 @@ def admin_users():
     page = request.args.get("page", 1, type=int)
     per_page = 10
     offset = (page - 1) * per_page
+    search = request.args.get("search", "").strip()
 
     db = get_db()
-    total = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-    total_pages = (total + per_page - 1) // per_page
-    users = db.execute(
-        "SELECT id, username, role, created_at FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?",
-        (per_page, offset),
-    ).fetchall()
+    if search:
+        total = db.execute(
+            "SELECT COUNT(*) FROM users WHERE username LIKE ?",
+            (f"%{search}%",),
+        ).fetchone()[0]
+        total_pages = (total + per_page - 1) // per_page
+        users = db.execute(
+            "SELECT id, username, role, created_at FROM users WHERE username LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+            (f"%{search}%", per_page, offset),
+        ).fetchall()
+    else:
+        total = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        total_pages = (total + per_page - 1) // per_page
+        users = db.execute(
+            "SELECT id, username, role, created_at FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?",
+            (per_page, offset),
+        ).fetchall()
     return render_template(
         "admin_users.html",
         users=users,
         page=page,
         total_pages=total_pages,
         total=total,
+        search=search,
     )
 
 

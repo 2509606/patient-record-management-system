@@ -1,11 +1,12 @@
 {% if total_pages > 1 %}
+{% set search_param = "&search=" ~ search if search is defined and search else "" %}
 <div class="flex items-center justify-between mt-6">
     <p class="text-sm text-muted-foreground">
         Showing {{ ((page - 1) * 10) + 1 }}–{{ [page * 10, total]|min }} of {{ total }}
     </p>
     <nav class="flex items-center gap-1">
         {% if page > 1 %}
-        <a href="?page={{ page - 1 }}"
+        <a href="?page={{ page - 1 }}{{ search_param }}"
            class="inline-flex items-center justify-center w-9 h-9 text-sm rounded-lg border border-border bg-background text-foreground hover:bg-accent transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </a>
@@ -19,7 +20,7 @@
             {% if p == page %}
             <span class="inline-flex items-center justify-center w-9 h-9 text-sm font-medium rounded-lg bg-primary text-primary-foreground">{{ p }}</span>
             {% elif p == 1 or p == total_pages or (p >= page - 1 and p <= page + 1) %}
-            <a href="?page={{ p }}"
+            <a href="?page={{ p }}{{ search_param }}"
                class="inline-flex items-center justify-center w-9 h-9 text-sm rounded-lg border border-border bg-background text-foreground hover:bg-accent transition-colors">{{ p }}</a>
             {% elif p == page - 2 or p == page + 2 %}
             <span class="inline-flex items-center justify-center w-9 h-9 text-sm text-muted-foreground">...</span>
@@ -27,7 +28,7 @@
         {% endfor %}
 
         {% if page < total_pages %}
-        <a href="?page={{ page + 1 }}"
+        <a href="?page={{ page + 1 }}{{ search_param }}"
            class="inline-flex items-center justify-center w-9 h-9 text-sm rounded-lg border border-border bg-background text-foreground hover:bg-accent transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </a>
