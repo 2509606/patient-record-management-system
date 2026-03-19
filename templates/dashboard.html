@@ -11,6 +11,7 @@
 
 <!-- Stats cards -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    {% if session.get("role") in ("admin", "doctor", "nurse") %}
     <div class="bg-card border border-border rounded-xl p-5 shadow-sm">
         <div class="flex items-center justify-between mb-3">
             <p class="text-sm text-muted-foreground">Active Patients</p>
@@ -19,6 +20,37 @@
         <p class="text-3xl font-bold text-card-foreground tracking-tight">{{ patient_count }}</p>
         <p class="text-xs text-muted-foreground mt-1">Total active records</p>
     </div>
+    {% endif %}
+
+    {% if session.get("role") in ("doctor", "nurse") %}
+    <div class="bg-card border border-border rounded-xl p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-sm text-muted-foreground">Pending Appointments</p>
+            <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <p class="text-3xl font-bold text-card-foreground tracking-tight">{{ pending_appointments|default(0) }}</p>
+        <p class="text-xs text-muted-foreground mt-1">Awaiting confirmation</p>
+    </div>
+    {% endif %}
+
+    {% if session.get("role") == "patient" %}
+    <div class="bg-card border border-border rounded-xl p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-sm text-muted-foreground">My Appointments</p>
+            <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <p class="text-3xl font-bold text-card-foreground tracking-tight">{{ my_appointments|default(0) }}</p>
+        <p class="text-xs text-muted-foreground mt-1">Active appointments</p>
+    </div>
+    <div class="bg-card border border-border rounded-xl p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-sm text-muted-foreground">My Prescriptions</p>
+            <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        </div>
+        <p class="text-3xl font-bold text-card-foreground tracking-tight">{{ my_prescriptions|default(0) }}</p>
+        <p class="text-xs text-muted-foreground mt-1">Total prescriptions</p>
+    </div>
+    {% endif %}
 
     <div class="bg-card border border-border rounded-xl p-5 shadow-sm">
         <div class="flex items-center justify-between mb-3">
@@ -38,7 +70,8 @@
     </div>
     <div class="p-5">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            <a href="{{ url_for('patients') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
+            {% if session.get("role") in ("admin", "doctor", "nurse") %}
+            <a href="{{ url_for('patients_bp.patients') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
                 <div class="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
                 </div>
@@ -47,8 +80,10 @@
                     <p class="text-xs text-muted-foreground">Browse patient records</p>
                 </div>
             </a>
+            {% endif %}
 
-            <a href="{{ url_for('add_patient') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
+            {% if session.get("role") in ("admin", "doctor") %}
+            <a href="{{ url_for('patients_bp.add_patient') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
                 <div class="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                 </div>
@@ -57,9 +92,32 @@
                     <p class="text-xs text-muted-foreground">Create a patient record</p>
                 </div>
             </a>
+            {% endif %}
+
+            <a href="{{ url_for('appointments_bp.appointments') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
+                <div class="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-foreground group-hover:text-foreground">{% if session.get("role") == "patient" %}My Appointments{% else %}View Appointments{% endif %}</p>
+                    <p class="text-xs text-muted-foreground">{% if session.get("role") == "patient" %}Book and manage{% else %}Manage appointments{% endif %}</p>
+                </div>
+            </a>
+
+            {% if session.get("role") == "patient" %}
+            <a href="{{ url_for('appointments_bp.book_appointment') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
+                <div class="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-foreground group-hover:text-foreground">Book Appointment</p>
+                    <p class="text-xs text-muted-foreground">Schedule a new visit</p>
+                </div>
+            </a>
+            {% endif %}
 
             {% if session.get("role") == "admin" %}
-            <a href="{{ url_for('register') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
+            <a href="{{ url_for('admin.register') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
                 <div class="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
                 </div>
@@ -69,7 +127,7 @@
                 </div>
             </a>
 
-            <a href="{{ url_for('admin_users') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
+            <a href="{{ url_for('admin.admin_users') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
                 <div class="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 </div>
@@ -79,7 +137,7 @@
                 </div>
             </a>
 
-            <a href="{{ url_for('audit_log') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
+            <a href="{{ url_for('admin.audit_log') }}" class="group flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/60 transition-colors">
                 <div class="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 </div>
