@@ -10,12 +10,14 @@
             <p class="text-sm text-muted-foreground mt-1">Patient <span class="font-medium text-foreground">#{{ patient.patient_id }}</span></p>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ url_for('edit_patient', patient_id=patient.patient_id) }}"
+            {% if session.get("role") in ("admin", "doctor") %}
+            <a href="{{ url_for('patients_bp.edit_patient', patient_id=patient.patient_id) }}"
                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Edit
             </a>
-            <a href="{{ url_for('patients') }}"
+            {% endif %}
+            <a href="{{ url_for('patients_bp.patients') }}"
                class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-border bg-background text-foreground hover:bg-accent transition-colors">
                 Back to List
             </a>
@@ -82,5 +84,82 @@
             </div>
         </div>
     </div>
+
+    <!-- Medical Files Section -->
+    {% if session.get("role") in ("admin", "doctor", "nurse") %}
+    <div class="mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-foreground">Medical Files</h2>
+        </div>
+
+        {% if session.get("role") in ("admin", "doctor") %}
+        <div class="bg-card border border-border rounded-xl shadow-sm p-5 mb-4">
+            <form method="POST" action="{{ url_for('uploads_bp.upload_file', patient_id=patient.patient_id) }}" enctype="multipart/form-data" class="flex items-end gap-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-foreground mb-1.5">Upload File</label>
+                    <input type="file" name="file" required accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx"
+                           class="w-full text-sm text-foreground file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border file:border-border file:bg-background file:text-foreground file:text-sm file:font-medium file:cursor-pointer hover:file:bg-accent">
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-foreground mb-1.5">Description</label>
+                    <input type="text" name="description" placeholder="Optional description"
+                           class="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 transition-colors">
+                </div>
+                <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer">
+                    Upload
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if medical_files %}
+        <div class="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-border bg-muted/50">
+                        <th class="text-left px-4 py-3 font-medium text-muted-foreground">File</th>
+                        <th class="text-left px-4 py-3 font-medium text-muted-foreground">Description</th>
+                        <th class="text-left px-4 py-3 font-medium text-muted-foreground">Uploaded By</th>
+                        <th class="text-left px-4 py-3 font-medium text-muted-foreground">Date</th>
+                        <th class="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in medical_files %}
+                    <tr class="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                        <td class="px-4 py-3 font-medium">{{ file.filename }}</td>
+                        <td class="px-4 py-3 text-muted-foreground">{{ file.description or "—" }}</td>
+                        <td class="px-4 py-3 text-muted-foreground">{{ file.uploaded_by }}</td>
+                        <td class="px-4 py-3 text-muted-foreground text-xs">{{ file.uploaded_at|datetimeformat }}</td>
+                        <td class="px-4 py-3 text-right">
+                            <div class="flex items-center justify-end gap-1">
+                                <a href="{{ url_for('uploads_bp.serve_file', stored_filename=file.stored_filename) }}" target="_blank"
+                                   class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-md border border-border bg-background text-foreground hover:bg-accent transition-colors">
+                                    View
+                                </a>
+                                {% if session.get("role") in ("admin", "doctor") %}
+                                <form method="POST" action="{{ url_for('uploads_bp.delete_file', patient_id=patient.patient_id, file_id=file._id|string) }}" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <button type="submit" onclick="return confirm('Delete this file?')"
+                                            class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors cursor-pointer">
+                                        Delete
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="bg-card border border-border rounded-xl shadow-sm p-8 text-center">
+            <p class="text-sm text-muted-foreground">No medical files uploaded yet.</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
