@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Receipt - Patient Records{% endblock %}
+{% block page_title %}Payment Receipt{% endblock %}
+
+{% block content %}
+<div class="max-w-md">
+    <div class="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-border text-center">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-100 flex items-center justify-center">
+                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h2 class="text-lg font-semibold text-card-foreground">Payment Successful</h2>
+            <p class="text-sm text-muted-foreground">Transaction completed</p>
+        </div>
+        <div class="divide-y divide-border">
+            <div class="grid grid-cols-2 px-5 py-3">
+                <dt class="text-sm text-muted-foreground">Payment ID</dt>
+                <dd class="text-sm font-mono text-card-foreground text-right">{{ payment.payment_id }}</dd>
+            </div>
+            <div class="grid grid-cols-2 px-5 py-3 bg-muted/30">
+                <dt class="text-sm text-muted-foreground">Appointment</dt>
+                <dd class="text-sm font-mono text-card-foreground text-right">{{ payment.appointment_id }}</dd>
+            </div>
+            <div class="grid grid-cols-2 px-5 py-3">
+                <dt class="text-sm text-muted-foreground">Amount</dt>
+                <dd class="text-sm font-semibold text-card-foreground text-right">${{ "%.2f"|format(payment.amount) }}</dd>
+            </div>
+            <div class="grid grid-cols-2 px-5 py-3 bg-muted/30">
+                <dt class="text-sm text-muted-foreground">Card</dt>
+                <dd class="text-sm text-card-foreground text-right">**** {{ payment.card_last_four }}</dd>
+            </div>
+            <div class="grid grid-cols-2 px-5 py-3">
+                <dt class="text-sm text-muted-foreground">Date</dt>
+                <dd class="text-sm text-card-foreground text-right">{{ payment.paid_at|datetimeformat }}</dd>
+            </div>
+            <div class="grid grid-cols-2 px-5 py-3 bg-muted/30">
+                <dt class="text-sm text-muted-foreground">Status</dt>
+                <dd class="text-right">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700">{{ payment.status }}</span>
+                </dd>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a href="{{ url_for('payments_bp.payment_history') }}"
+           class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-border bg-background text-foreground hover:bg-accent transition-colors">
+            Back to Payment History
+        </a>
+    </div>
+</div>
+{% endblock %}

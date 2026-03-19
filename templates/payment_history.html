@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Payment History - Patient Records{% endblock %}
+{% block page_title %}Payment History{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-semibold text-foreground tracking-tight">Payment History</h1>
+    <p class="text-sm text-muted-foreground mt-1">Your payment transactions</p>
+</div>
+
+{% if payments %}
+<div class="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border bg-muted/50">
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Payment ID</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Appointment</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Amount</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Card</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Date</th>
+                    <th class="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pay in payments %}
+                <tr class="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                    <td class="px-4 py-3 font-mono text-xs">{{ pay.payment_id }}</td>
+                    <td class="px-4 py-3 font-mono text-xs">{{ pay.appointment_id }}</td>
+                    <td class="px-4 py-3 font-medium">${{ "%.2f"|format(pay.amount) }}</td>
+                    <td class="px-4 py-3 text-muted-foreground">**** {{ pay.card_last_four }}</td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700">{{ pay.status }}</span>
+                    </td>
+                    <td class="px-4 py-3 text-muted-foreground text-xs">{{ pay.paid_at|datetimeformat }}</td>
+                    <td class="px-4 py-3 text-right">
+                        <a href="{{ url_for('payments_bp.receipt', payment_id=pay.payment_id) }}"
+                           class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-md border border-border bg-background text-foreground hover:bg-accent transition-colors">
+                            Receipt
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="bg-card border border-border rounded-xl shadow-sm p-12 text-center">
+    <p class="text-muted-foreground text-sm">No payment history.</p>
+</div>
+{% endif %}
+
+{% include "pagination.html" %}
+{% endblock %}

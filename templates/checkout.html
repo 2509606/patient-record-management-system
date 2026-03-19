@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Checkout - Patient Records{% endblock %}
+{% block page_title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="max-w-md">
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-foreground tracking-tight">Payment</h1>
+        <p class="text-sm text-muted-foreground mt-1">Pay for appointment {{ appointment.appointment_id }}</p>
+    </div>
+
+    <div class="bg-card border border-border rounded-xl shadow-sm mb-4 p-5">
+        <h3 class="text-sm font-medium text-muted-foreground mb-2">Appointment Summary</h3>
+        <div class="space-y-1 text-sm">
+            <p><span class="text-muted-foreground">Doctor:</span> Dr. {{ appointment.clinician_username }}</p>
+            <p><span class="text-muted-foreground">Date:</span> {{ appointment.date }} at {{ appointment.time }}</p>
+            <p><span class="text-muted-foreground">Reason:</span> {{ appointment.reason }}</p>
+        </div>
+    </div>
+
+    <div class="bg-card border border-border rounded-xl shadow-sm">
+        <form method="POST" class="p-6 space-y-5">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div>
+                <label for="amount" class="block text-sm font-medium text-foreground mb-1.5">Amount</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                    <input type="text" id="amount" name="amount" value="50.00" readonly
+                           class="w-full pl-7 pr-3 py-2 text-sm rounded-lg border border-input bg-muted text-foreground focus:outline-none transition-colors">
+                </div>
+            </div>
+
+            <div>
+                <label for="card_number" class="block text-sm font-medium text-foreground mb-1.5">Card Number</label>
+                <input type="text" id="card_number" name="card_number" required placeholder="4242 4242 4242 4242" maxlength="19"
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring transition-colors">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="expiry" class="block text-sm font-medium text-foreground mb-1.5">Expiry</label>
+                    <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5"
+                           class="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring transition-colors">
+                </div>
+                <div>
+                    <label for="cvv" class="block text-sm font-medium text-foreground mb-1.5">CVV</label>
+                    <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4"
+                           class="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring transition-colors">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="submit"
+                        class="w-full inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer">
+                    Pay $50.00
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
