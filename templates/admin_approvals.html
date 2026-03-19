@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Approvals - Patient Records{% endblock %}
+{% block page_title %}User Approvals{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-semibold text-foreground tracking-tight">Pending Approvals</h1>
+    <p class="text-sm text-muted-foreground mt-1">Review and approve new user registrations</p>
+</div>
+
+{% if users %}
+<div class="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border bg-muted/50">
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Username</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Email</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Role</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Registered</th>
+                    <th class="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                    <td class="px-4 py-3 font-medium">{{ user.username }}</td>
+                    <td class="px-4 py-3 text-muted-foreground">{{ user.email or "—" }}</td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground capitalize">{{ user.role }}</span>
+                    </td>
+                    <td class="px-4 py-3 text-muted-foreground text-xs">{{ user.created_at|datetimeformat }}</td>
+                    <td class="px-4 py-3 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <form method="POST" action="{{ url_for('admin.approve_user', user_id=user.id) }}" class="inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <button type="submit"
+                                        class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors cursor-pointer">
+                                    Approve
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('admin.reject_user', user_id=user.id) }}" class="inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <button type="submit" onclick="return confirm('Reject this registration?')"
+                                        class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors cursor-pointer">
+                                    Reject
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="bg-card border border-border rounded-xl shadow-sm p-12 text-center">
+    <svg class="w-12 h-12 mx-auto text-muted-foreground/40 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <p class="text-muted-foreground text-sm">No pending registrations.</p>
+</div>
+{% endif %}
+
+{% include "pagination.html" %}
+{% endblock %}

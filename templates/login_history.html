@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Login History - Patient Records{% endblock %}
+{% block page_title %}{% if view_all %}Login History (All Users){% else %}My Login History{% endif %}{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-semibold text-foreground tracking-tight">{% if view_all %}Login History{% else %}My Login History{% endif %}</h1>
+    <p class="text-sm text-muted-foreground mt-1">{% if view_all %}Track all user login sessions{% else %}Your recent login sessions{% endif %}</p>
+</div>
+
+{% if records %}
+<div class="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border bg-muted/50">
+                    {% if view_all %}
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">User</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Role</th>
+                    {% endif %}
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Login Time</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Logout Time</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">Duration</th>
+                    <th class="text-left px-4 py-3 font-medium text-muted-foreground">IP Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr class="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                    {% if view_all %}
+                    <td class="px-4 py-3 font-medium">{{ record.username }}</td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground capitalize">{{ record.role }}</span>
+                    </td>
+                    {% endif %}
+                    <td class="px-4 py-3 text-xs">{{ record.login_at|datetimeformat }}</td>
+                    <td class="px-4 py-3 text-xs">{{ record.logout_at|datetimeformat if record.logout_at else "Active" }}</td>
+                    <td class="px-4 py-3 text-muted-foreground text-xs">
+                        {% if record.duration_seconds %}
+                            {% set mins = (record.duration_seconds // 60) %}
+                            {% set secs = (record.duration_seconds % 60) %}
+                            {{ mins }}m {{ secs }}s
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs text-muted-foreground">{{ record.ip_address }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="bg-card border border-border rounded-xl shadow-sm p-12 text-center">
+    <p class="text-muted-foreground text-sm">No login history found.</p>
+</div>
+{% endif %}
+
+{% include "pagination.html" %}
+{% endblock %}
