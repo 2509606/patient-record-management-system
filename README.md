@@ -129,6 +129,20 @@ patient-record-management-system/
 - **Username:** admin
 - **Password:** admin123
 
+### Doctor Account
+- **Username:** George.B
+- **Password:** George123
+
+### Nurse Account
+- **Username:** Joel Eshegbe
+- **Password:** Eshegbe123
+
+### Patient Account
+- **Username:** C.Akhimien
+- **Password:** Cleverson123
+
+"Usernames are case-sensitive and must be entered exactly as shown"
+
 ## Running Tests
 
 ```bash
