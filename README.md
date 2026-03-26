@@ -2,6 +2,8 @@
 
 A web-based patient record management system built with Flask for the COM7033 Secure Software Development module at Leeds Trinity University.
 
+Link to project -- https://github.com/2509606/COM7033-Cleverson.O.Akhimien-Assignment
+
 ## Features
 
 - **User Authentication** - Secure login and signup with hashed passwords, role-based access
